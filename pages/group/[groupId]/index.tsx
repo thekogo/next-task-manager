@@ -41,7 +41,7 @@ export default function GroupDetailPage({code, groupMembers}: Props) {
               <div className="flow-root">
                 <ul className="divide-y divide-gray-200 dark:divide-gray-700">
                   {groupMembers.map(member => (
-                    <li className="py-3 sm:py-4">
+                    <li key={member.userId} className="py-3 sm:py-4">
                       <div className="flex items-center space-x-4">
                         <div className="shrink-0">
                           <img

@@ -38,7 +38,7 @@ export default function ListTaskView({tasks, groupMembers}: Props) {
           <Select onChange={(e) => setFilterUserId(Number(e.currentTarget.value))}>
             <option value={0}>ทั้งหมด</option>
             {groupMembers.map(member => (
-              <option value={member.userId}>{displayName(member.user)}</option>
+              <option key={member.userId} value={member.userId}>{displayName(member.user)}</option>
             ))}
           </Select>
         </Card>
@@ -65,7 +65,7 @@ export default function ListTaskView({tasks, groupMembers}: Props) {
             </Table.Head>
             <Table.Body className="divide-y">
               {filterTasks.map(task => (
-                <Table.Row>
+                <Table.Row key={task.id}>
                   <Table.Cell>
                     {task.id}
                   </Table.Cell>

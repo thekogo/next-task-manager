@@ -93,7 +93,7 @@ export default function CreateTaskView({groupMembers, tasks}: Props) {
                     required={true}
                   >
                     {groupMembers.map(member => (
-                      <option value={member.user.id}>
+                      <option key={member.userId} value={member.user.id}>
                         {displayName(member.user)}
                       </option>
                     ))}

@@ -107,7 +107,7 @@ export default function TaskView({task, comments}: Props) {
           <h3 className="text-xl">การตอบกลับ</h3>
           <Timeline>
             {comments.map(comment => (
-              <Timeline.Item>
+              <Timeline.Item key={comment.id}>
                 <Timeline.Point />
                 <Timeline.Content>
                   <Timeline.Time>

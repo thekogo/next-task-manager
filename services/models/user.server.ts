@@ -22,3 +22,19 @@ export async function getUserOrCreateByLineProfile(lineProfile: Profile) {
     }
   })
 }
+
+export async function updateProfile({userId, firstName, lastName}: {
+  userId: User["id"];
+  firstName: User["firstName"];
+  lastName: User["lastName"];
+}) {
+  return await prisma.user.update({
+    where: {
+      id: userId
+    }, 
+    data: {
+      firstName: firstName,
+      lastName: lastName
+    }
+  })
+}

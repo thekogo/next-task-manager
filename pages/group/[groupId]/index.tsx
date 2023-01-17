@@ -1,5 +1,7 @@
 import { Card } from "flowbite-react";
 import { withIronSessionSsr } from "iron-session/next";
+import Link from "next/link";
+import { useRouter } from "next/router";
 import Nav from "~/components/Nav";
 import { sessionOptions } from "~/lib/session";
 import { getGroupMember, getGroupMemberByGroupId } from "~/services/models/group.server";
@@ -10,6 +12,8 @@ type Props = {
 }
 
 export default function GroupDetailPage({code, groupMembers}: Props) {
+  const router = useRouter();
+  const { groupId } = router.query
   return (
     <div>
       <Nav />
@@ -31,12 +35,12 @@ export default function GroupDetailPage({code, groupMembers}: Props) {
                 <h5 className="text-xl font-bold leading-none text-gray-900 dark:text-white">
                   สมาชิก
                 </h5>
-                <a
-                  href="#"
+                <Link
+                  href={`/group/${groupId}/member`}
                   className="text-sm font-medium text-blue-600 hover:underline dark:text-blue-500"
                 >
                   จัดการสมาชิก
-                </a>
+                </Link>
               </div>
               <div className="flow-root">
                 <ul className="divide-y divide-gray-200 dark:divide-gray-700">

@@ -22,7 +22,7 @@ export default async function handlePostback(event: WebhookEvent) {
           })
           await client.replyMessage(event.replyToken, {
             type: "text",
-            text: `จะมีการแจ้งเตือนอีกครั้งเวลา ${displayDate(task.alertDate)}`
+            text: `จะมีการแจ้งเตือนอีกครั้งเวลา ${displayDate(task.deadLineDate)}`
           })
         }
         break;

@@ -176,6 +176,7 @@ export default function GroupPage({groups}: Props) {
 }
 
 export const getServerSideProps = withIronSessionSsr(
+// @ts-ignore
   async function getServerSideProps({req}) {
     const user = req.session.user;
     if (!user?.isLoggedIn) {

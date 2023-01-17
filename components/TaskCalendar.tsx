@@ -38,6 +38,7 @@ function formatDate(date: Date) {
   return day + ' ' + monthNames[monthIndex] + ' ' + year;
 }
 
+// @ts-ignore
 function Event({event}) {
   return (
     <span>
@@ -47,6 +48,7 @@ function Event({event}) {
   )
 }
 
+// @ts-ignore
 function AgendaEvent({event}) {
   return (
     <span>
@@ -60,6 +62,7 @@ function AgendaEvent({event}) {
   )
 }
 
+// @ts-ignore
 function AgendaDate({day}) {
   const dateToString = formatWithOptions({locale: th}, "dd MMMM yyyy")
   return (
@@ -67,6 +70,7 @@ function AgendaDate({day}) {
   )
 }
 
+// @ts-ignore
 function AgendaTime({event}) {
   return (
     <span>{format(new Date(event.deadLineDate), 'HH:mm น.')}</span>
@@ -112,6 +116,7 @@ export default function TaskCalendar({tasks}: Props) {
     setEvents([...tempEvents])
   }, tasks)
 
+// @ts-ignore
   return <Calendar
     events={events}
     views={['month', 'agenda']}

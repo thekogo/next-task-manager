@@ -1,6 +1,7 @@
 import { MessageEvent, PostbackEvent, WebhookEvent } from '@line/bot-sdk';
 import type { NextApiRequest, NextApiResponse } from 'next'
 import handleMessage from '~/services/linebot/handleMessage';
+import handlePostback from '~/services/linebot/handlePostback';
 
 async function taskEventHandler(event: WebhookEvent) {
   switch (event.type) {

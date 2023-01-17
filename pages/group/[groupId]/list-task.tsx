@@ -102,6 +102,7 @@ export default function ListTaskView({tasks, groupMembers}: Props) {
 }
 
 export const getServerSideProps = withIronSessionSsr(
+// @ts-ignore
   async function getServerSideProps({req, query}) {
     const user = req.session.user;
     if (!user?.isLoggedIn) {

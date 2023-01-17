@@ -33,6 +33,10 @@ export default async function sendNotifyNewTask({task, lineId}: {
       text: desc + '\r\nกำหนดส่งงาน: ' + displayDate(task.deadLineDate)
     }
   }
-  await client.pushMessage(lineId, message);
+  try {
+    await client.pushMessage(lineId, message);
+  } catch(e) {
+    console.log(e.originalError.response.data)
+  }
 }
 

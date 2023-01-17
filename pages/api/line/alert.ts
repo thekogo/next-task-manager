@@ -9,6 +9,11 @@ export default async function handler(
   let currentDate = new Date();
   currentDate.setSeconds(0,0)
   currentDate = addHours(currentDate, 7)
-  await sendAlertTask({date: new Date(currentDate.toISOString())}) 
+  console.log(currentDate)
+  try {
+    await sendAlertTask({date: new Date(currentDate.toISOString())}) 
+  } catch(e) {
+    console.log(e.orignalError.response.data)
+  }
   res.status(200).json({ status: 'success' })
 }

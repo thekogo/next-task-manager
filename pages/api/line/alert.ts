@@ -8,8 +8,6 @@ export default async function handler(
 ) {
   let currentDate = new Date();
   currentDate.setSeconds(0,0)
-  currentDate = addHours(currentDate, 7)
-  console.log(currentDate)
   try {
     await sendAlertTask({date: new Date(currentDate.toISOString())}) 
   } catch(e) {

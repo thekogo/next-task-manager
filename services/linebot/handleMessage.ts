@@ -112,7 +112,7 @@ async function buildUpdateCommentMessage({taskId, lineId, message}: {
     const comment = await createComment({taskId: taskId, userId: user.id, message: message});
     return {
       type: "text",
-      text: "บันทึกรายละเอียดเสร็จสิ้น"
+      text: "รับทราบ จะดำเนินการตรวจสอบอีกครั้ง"
     }
   } catch(e) {
     return {

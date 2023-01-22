@@ -103,15 +103,28 @@ export async function getUnfinishedTaskByDate({date}: {
   }
   return await prisma.task.findMany({
     where: {
-      OR: [
+      AND: [
         {
-          status: TaskStatus.CREATED
-        },
+          OR: [
+            {
+              status: TaskStatus.CREATED
+            },
+            {
+              status: TaskStatus.DOING
+            }
+          ],
+        }, 
         {
-          status: TaskStatus.DOING
+          OR: [
+            {
+              alertDate: date
+            },
+            {
+              deadLineDate: date
+            }
+          ]
         }
-      ],
-      alertDate: date    
+      ]
     },
     include: {
       worker: {

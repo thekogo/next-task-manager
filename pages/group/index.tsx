@@ -1,33 +1,16 @@
-import { Button, Label, Table, TextInput, Modal } from "flowbite-react";
-import { withIronSessionSsr } from "iron-session/next";
+import { Button, Table } from "flowbite-react";
 import Link from "next/link";
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import Nav from "~/components/Nav";
-import { getGroupsByUserId, Group } from "~/services/models/group.server";
-import { sessionOptions } from "~/lib/session";
-import axios, { AxiosError } from "axios";
-import { toast } from "react-toastify";
-import { useRouter } from "next/router";
 import CreateModal from './_CreateModal';
 import JoinModal from './_JoinModal';
-import { useSetRecoilState } from "recoil";
+import { useRecoilValue } from "recoil";
 import { groupState } from "~/store/groupState";
 
-type Props = {
-  groups: Awaited<ReturnType<typeof getGroupsByUserId>>
-  // groups: Group[]
-}
-
-export default function GroupPage({groups}: Props) {
-  const router = useRouter();
+export default function GroupPage() {
   const [showModalCreateGroup, setShowModalCreateGroup] = useState(false);
   const [showModalJoinGroup, setShowModalJoinGroup] = useState(false);
-  const setGroupState = useSetRecoilState(groupState);
-
-  useEffect(() => {
-    console.log("group", groups)
-    setGroupState(groups)
-  }, [groups])
+  const groups = useRecoilValue(groupState)
 
   return (
     <div>
@@ -70,24 +53,3 @@ export default function GroupPage({groups}: Props) {
     </div>
   )
 }
-
-export const getServerSideProps = withIronSessionSsr(
-// @ts-ignore
-  async function getServerSideProps({req}) {
-    const user = req.session.user;
-    if (!user?.isLoggedIn) {
-      return {
-        redirect: {
-          destination: "/"
-        },
-        props: {}
-      }
-    }
-    const groups = await getGroupsByUserId({userId: user?.userId})
-    return {
-      props: {
-        groups: groups
-      }
-    }
-  }, sessionOptions
-)

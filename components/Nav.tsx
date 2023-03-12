@@ -1,8 +1,12 @@
 import { Role } from "@prisma/client";
+import axios from "axios";
 import { Navbar } from "flowbite-react";
+import { withIronSessionSsr } from "iron-session/next";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { useRecoilValue } from "recoil";
+import { useRecoilState } from "recoil";
+import { sessionOptions } from "~/lib/session";
+import { getGroupsByUserId } from "~/services/models/group.server";
 import { groupState } from "~/store/groupState";
 
 
@@ -10,7 +14,7 @@ export default function Nav() {
   const router = useRouter()
   const { groupId } = router.query
   const pathname = router.pathname
-  const groups = useRecoilValue(groupState);
+  const [groups, setGroups] = useRecoilState(groupState);
   const [isManager, setIsManager] = useState(false)
   
   useEffect(() => {
@@ -18,7 +22,16 @@ export default function Nav() {
       const currentGroup = groups.find(group => group.id === Number(groupId))
       const myPermission = currentGroup?.members.find(user => user.role === Role.MANAGER)
       setIsManager(myPermission !== undefined);
+      return
     }
+
+    async function fetchGroup() {
+      const resp = await axios.get("/api/group/mygroup")
+      setGroups(resp.data)
+    }
+
+    fetchGroup()
+
   }, [groupId, groups])
 
   return (

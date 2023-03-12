@@ -1,10 +1,14 @@
+import { Role } from "@prisma/client";
 import { Card } from "flowbite-react";
 import { withIronSessionSsr } from "iron-session/next";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import { useRecoilValue } from "recoil";
 import Nav from "~/components/Nav";
 import { sessionOptions } from "~/lib/session";
 import { getGroupMember, getGroupMemberByGroupId } from "~/services/models/group.server";
+import { groupState } from "~/store/groupState";
 
 type Props = {
   code: string;
@@ -14,6 +18,16 @@ type Props = {
 export default function GroupDetailPage({code, groupMembers}: Props) {
   const router = useRouter();
   const { groupId } = router.query
+  const groups = useRecoilValue(groupState);
+  const [isManager, setIsManager] = useState(false)
+  
+  useEffect(() => {
+    if(groups.length > 0) {
+      const currentGroup = groups.find(group => group.id === Number(groupId))
+      const myPermission = currentGroup?.members.find(user => user.role === Role.MANAGER)
+      setIsManager(myPermission !== undefined);
+    }
+  }, [groupId, groups])
   return (
     <div>
       <Nav />
@@ -35,12 +49,14 @@ export default function GroupDetailPage({code, groupMembers}: Props) {
                 <h5 className="text-xl font-bold leading-none text-gray-900 dark:text-white">
                   สมาชิก
                 </h5>
-                <Link
-                  href={`/group/${groupId}/member`}
-                  className="text-sm font-medium text-blue-600 hover:underline dark:text-blue-500"
-                >
-                  จัดการสมาชิก
-                </Link>
+                { isManager && 
+                  <Link
+                    href={`/group/${groupId}/member`}
+                    className="text-sm font-medium text-blue-600 hover:underline dark:text-blue-500"
+                  >
+                    จัดการสมาชิก
+                  </Link>
+                }
               </div>
               <div className="flow-root">
                 <ul className="divide-y divide-gray-200 dark:divide-gray-700">

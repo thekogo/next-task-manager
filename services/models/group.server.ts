@@ -6,17 +6,28 @@ export type { Group } from "@prisma/client";
 
 export function getGroupsByUserId({ userId }: { userId: User["id"] }) {
   return prisma.group.findMany({
-    where: { 
+    where: {
       members: {
         some: {
+          userId: userId,
+        },
+      },
+    },
+    include: {
+      members: {
+        where: {
           userId: userId
-        }
+        },
       }
     }
   });
 }
 
-export async function createGroup({userId, name, code}: {
+export async function createGroup({
+  userId,
+  name,
+  code,
+}: {
   userId: User["id"];
   name: Group["name"];
   code: Group["code"];
@@ -24,60 +35,70 @@ export async function createGroup({userId, name, code}: {
   const group = await prisma.group.create({
     data: {
       name: name,
-      code: code
-    }
-  })
+      code: code,
+    },
+  });
 
   const groupMember = await prisma.groupMember.create({
     data: {
       groupId: group.id,
       userId: userId,
-      role: Role.MANAGER
-    }
-  })
+      role: Role.MANAGER,
+    },
+  });
   return groupMember;
 }
 
-export async function getGroupMember({userId, groupId}: {
-  userId: User["id"],
-  groupId: GroupMember["groupId"]
+export async function getGroupMember({
+  userId,
+  groupId,
+}: {
+  userId: User["id"];
+  groupId: GroupMember["groupId"];
 }) {
   const groupMember = await prisma.groupMember.findUnique({
     where: {
       userId_groupId: {
         userId: userId,
-        groupId: groupId
-      }
+        groupId: groupId,
+      },
     },
     include: {
       group: true,
-      user: true
-    }
-  })
-  
+      user: true,
+    },
+  });
+
   return groupMember;
 }
 
-export async function getGroupMemberByGroupId({groupId}: {groupId: GroupMember["groupId"]}) {
+export async function getGroupMemberByGroupId({
+  groupId,
+}: {
+  groupId: GroupMember["groupId"];
+}) {
   return await prisma.groupMember.findMany({
     where: {
-      groupId: groupId
+      groupId: groupId,
     },
     include: {
-      user: true
-    }
-  })
+      user: true,
+    },
+  });
 }
 
-export async function getGroupByCode({code}: {code: Group["code"]}) {
+export async function getGroupByCode({ code }: { code: Group["code"] }) {
   return await prisma.group.findUnique({
     where: {
-      code: code
-    }
-  })
+      code: code,
+    },
+  });
 }
 
-export async function joinGroup({groupId, userId}: {
+export async function joinGroup({
+  groupId,
+  userId,
+}: {
   groupId: GroupMember["groupId"];
   userId: GroupMember["userId"];
 }) {
@@ -85,14 +106,14 @@ export async function joinGroup({groupId, userId}: {
     where: {
       userId_groupId: {
         userId: userId,
-        groupId: groupId
-      }
+        groupId: groupId,
+      },
     },
     update: {},
     create: {
       userId: userId,
       groupId: groupId,
-      role: Role.MEMBER
-    }
-  })
+      role: Role.MEMBER,
+    },
+  });
 }

@@ -1,11 +1,25 @@
+import { Role } from "@prisma/client";
 import { Navbar } from "flowbite-react";
 import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import { useRecoilValue } from "recoil";
+import { groupState } from "~/store/groupState";
 
 
 export default function Nav() {
   const router = useRouter()
   const { groupId } = router.query
   const pathname = router.pathname
+  const groups = useRecoilValue(groupState);
+  const [isManager, setIsManager] = useState(false)
+  
+  useEffect(() => {
+    if(groups.length > 0) {
+      const currentGroup = groups.find(group => group.id === Number(groupId))
+      const myPermission = currentGroup?.members.find(user => user.role === Role.MANAGER)
+      setIsManager(myPermission !== undefined);
+    }
+  }, [groupId, groups])
 
   return (
     <Navbar
@@ -33,18 +47,22 @@ export default function Nav() {
         </Navbar.Link>
         {groupId && 
           <>
-            <Navbar.Link 
-              href={`/group/${groupId}`}
-              active={pathname === "/group/[groupId]"}
-            >
-              สมาชิกกลุ่ม
-            </Navbar.Link>
-            <Navbar.Link 
-              href={`/group/${groupId}/create-task`}
-              active={pathname === "/group/[groupId]/create-task"}
-            >
-              จัดการงาน
-            </Navbar.Link>
+            {isManager && 
+              <>
+                <Navbar.Link 
+                  href={`/group/${groupId}`}
+                  active={pathname === "/group/[groupId]"}
+                >
+                  สมาชิกกลุ่ม
+                </Navbar.Link>
+                <Navbar.Link 
+                  href={`/group/${groupId}/create-task`}
+                  active={pathname === "/group/[groupId]/create-task"}
+                >
+                  จัดการงาน
+                </Navbar.Link>
+                </>
+            }
             <Navbar.Link 
               href={`/group/${groupId}/list-task`}
               active={pathname === "/group/[groupId]/list-task"}

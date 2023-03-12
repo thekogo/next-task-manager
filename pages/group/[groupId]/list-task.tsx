@@ -1,29 +1,45 @@
+import { Role } from "@prisma/client";
 import axios from "axios";
 import { Button, Card, Select, Table } from "flowbite-react";
 import { withIronSessionSsr } from "iron-session/next";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import { useRecoilValue } from "recoil";
 import Nav from "~/components/Nav";
 import TaskCalendar from "~/components/TaskCalendar";
 import { sessionOptions } from "~/lib/session";
 import { getGroupMember, getGroupMemberByGroupId } from "~/services/models/group.server";
 import { getTaskByGroupId } from "~/services/models/task.server";
+import { groupState } from "~/store/groupState";
 import { displayDate, displayName, displayStatus } from "~/utils/display";
 
 type Props = {
   tasks: Awaited<ReturnType<typeof getTaskByGroupId>>;
   groupMembers: Awaited<ReturnType<typeof getGroupMemberByGroupId>>;
+  userId: number;
 }
 
-export default function ListTaskView({tasks, groupMembers}: Props) {
-  const [filterTasks, setFilterTask] = useState(tasks);
+export default function ListTaskView({groupMembers, userId}: Props) {
+  const [filterTasks, setFilterTask] = useState<Awaited<ReturnType<typeof getTaskByGroupId>>>([]);
   const [filterUserId, setFilterUserId] = useState(0);
   const router = useRouter();
   const { groupId } = router.query;
+  const groups = useRecoilValue(groupState);
+  const [isManager, setIsManager] = useState(false)
+  
+  useEffect(() => {
+    if(groups.length > 0) {
+      const currentGroup = groups.find(group => group.id === Number(groupId))
+      const myPermission = currentGroup?.members.find(user => user.role === Role.MANAGER)
+      setIsManager(myPermission !== undefined);
+    }
+  }, [groupId, groups])
 
   useEffect(() => {
     const fetchData = async () => {
-      const res = await axios.get(`/api/group/${groupId}/usertask/${filterUserId}`);
+      const targetUser = isManager ? filterUserId : userId
+      console.log(userId)
+      const res = await axios.get(`/api/group/${groupId}/usertask/${targetUser}`);
       setFilterTask(res.data)
     }
 
@@ -33,15 +49,17 @@ export default function ListTaskView({tasks, groupMembers}: Props) {
     <div>
       <Nav />
       <div className="container mx-auto">
-        <Card>
-          <h3 className="text-xl">ผู้รับมอบหมาย</h3>
-          <Select onChange={(e) => setFilterUserId(Number(e.currentTarget.value))}>
-            <option value={0}>ทั้งหมด</option>
-            {groupMembers.map(member => (
-              <option key={member.userId} value={member.userId}>{displayName(member.user)}</option>
-            ))}
-          </Select>
-        </Card>
+        { isManager && 
+          <Card>
+            <h3 className="text-xl">ผู้รับมอบหมาย</h3>
+            <Select onChange={(e) => setFilterUserId(Number(e.currentTarget.value))}>
+              <option value={0}>ทั้งหมด</option>
+              {groupMembers.map(member => (
+                <option key={member.userId} value={member.userId}>{displayName(member.user)}</option>
+              ))}
+            </Select>
+          </Card>
+        }
         <br />
         <Card>
           <h3 className="text-xl">รายการงาน</h3>
@@ -82,8 +100,12 @@ export default function ListTaskView({tasks, groupMembers}: Props) {
                     <a href={`/group/${task.groupMemberGroupId}/task/${task.id}`} className="w-full">
                       <Button size="sm" className="h-full w-full">ดูรายละเอียด</Button>
                     </a>
-                    <Button size="sm" color="warning" className="h-full">แก้ไข</Button>
-                    <Button size="sm" color="failure" className="h-full">ลบ</Button>
+                    { isManager && 
+                      <>
+                        <Button size="sm" color="warning" className="h-full">แก้ไข</Button>
+                        <Button size="sm" color="failure" className="h-full">ลบ</Button>
+                      </>
+                    }
                   </Table.Cell>
                 </Table.Row>
               ))}
@@ -93,7 +115,7 @@ export default function ListTaskView({tasks, groupMembers}: Props) {
         <br />
         <Card>
           <h3 className="text-xl">ปฎิทินงาน</h3>
-          <TaskCalendar tasks={tasks} />
+          <TaskCalendar tasks={filterTasks} />
         </Card>
       </div>
       <br />
@@ -125,12 +147,11 @@ export const getServerSideProps = withIronSessionSsr(
       }
     }
     const groupMembers =  await getGroupMemberByGroupId({groupId});
-    const tasks = await getTaskByGroupId({groupId})
 
     return {
       props: {
         code: groupMember.group.code,
-        tasks: JSON.parse(JSON.stringify(tasks)),
+        userId: user.userId,
         groupMembers: JSON.parse(JSON.stringify(groupMembers))
       }
     }

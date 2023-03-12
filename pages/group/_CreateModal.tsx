@@ -7,7 +7,7 @@ type Props = {
   showModalCreateGroup: boolean;
   setShowModalCreateGroup: Function
 }
-export default ({showModalCreateGroup, setShowModalCreateGroup}: Props) => {
+export default function CreateModal ({showModalCreateGroup, setShowModalCreateGroup}: Props) {
 
   async function submitCreateGroup(e: React.SyntheticEvent) {
     e.preventDefault();

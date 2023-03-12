@@ -8,7 +8,7 @@ type Props = {
   setShowModalJoinGroup: Function;
 }
 
-export default ({ showModalJoinGroup, setShowModalJoinGroup }: Props) => {
+export default function JoinModal ({ showModalJoinGroup, setShowModalJoinGroup }: Props) {
 
   async function submitJoinGroup(e: React.SyntheticEvent) {
     e.preventDefault()
